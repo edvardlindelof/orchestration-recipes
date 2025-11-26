@@ -1,0 +1,4 @@
+pyspark-data
+uv.lock
+airflow_home
+__pycache__
