@@ -60,7 +60,7 @@ def homeworlds(clean_people: DataFrame, clean_planets: DataFrame) -> DataFrame:
     )
 
 
-pyspark_resource = PySparkResource()
+pyspark_resource = PySparkResource(app_name="my-spark-app")
 
 defs = Definitions(
     assets=[raw_people, raw_planets, clean_people, clean_planets, homeworlds],

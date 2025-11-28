@@ -14,11 +14,11 @@ import requests
 
 class PySparkResource(ConfigurableResource):
 
-    # TODO add conf fields for understanding
+    app_name: str
 
     def get_session(self) -> SparkSession:
         """Get or create SparkSession."""
-        return SparkSession.builder.appName("DagsterPySpark").getOrCreate()
+        return SparkSession.builder.appName(self.app_name).getOrCreate()
 
 
 class PySparkIOManager(ConfigurableIOManager):

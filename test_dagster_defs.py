@@ -41,17 +41,17 @@ def test_assets(tmp_path: Path):
         }
     )
 
+    pyspark_resource = PySparkResource(app_name="my-spark-test-app")
     materialization_result = materialize(
         assets=[raw_people, raw_planets, clean_people, clean_planets, homeworlds],
         resources={
-            "pyspark": PySparkResource(),
+            "pyspark": pyspark_resource,
             "pyspark_io_manager": PySparkIOManager(
-                pyspark_resource=PySparkResource(),
-                data_path=str(tmp_path)
+                pyspark_resource=pyspark_resource, data_path=str(tmp_path)
             ),
             "swapi": FakeSWAPIResource(),
         },
     )
     homeworlds_data = materialization_result.asset_value("homeworlds").toPandas()
 
-    assert homeworlds_data.equals(expected_homeworlds_data), homeworlds_data.to_string() + "\n\n" + expected_homeworlds_data.to_string()
+    assert homeworlds_data.equals(expected_homeworlds_data)
