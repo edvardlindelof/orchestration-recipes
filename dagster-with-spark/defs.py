@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import requests
 from dagster import (
@@ -9,8 +10,10 @@ from dagster import (
     AssetKey,
     ResourceDependency,
     asset,
-    Definitions
+    Definitions,
+    materialize
 )
+import pandas as pd
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, when, regexp_replace
 
@@ -50,21 +53,21 @@ class PySparkIOManager(ConfigurableIOManager):
 
 
 class SWAPIResource(ConfigurableResource):
-    def fetch(self, endpoint: str) -> dict:
+    def fetch(self, endpoint: str) -> list[dict]:
         response = requests.get(f"https://swapi.dev/api/{endpoint}/")
         response.raise_for_status()
-        return response.json()
+        return response.json()["results"]
 
 
 @asset(io_manager_key="pyspark_io_manager")
 def raw_people(swapi: SWAPIResource, pyspark: PySparkResource) -> DataFrame:
     res = swapi.fetch("people")
-    return pyspark.get_session().createDataFrame(res["results"])
+    return pyspark.get_session().createDataFrame(res)
 
 @asset(io_manager_key="pyspark_io_manager")
 def raw_planets(swapi: SWAPIResource, pyspark: PySparkResource) -> DataFrame:
     res = swapi.fetch("planets")
-    return pyspark.get_session().createDataFrame(res["results"])
+    return pyspark.get_session().createDataFrame(res)
 
 @asset(io_manager_key="pyspark_io_manager")
 def clean_people(raw_people: DataFrame) -> DataFrame:
@@ -104,7 +107,7 @@ def clean_planets(raw_planets: DataFrame) -> DataFrame:
 
 @asset(io_manager_key="pyspark_io_manager")
 def homeworlds(clean_people: DataFrame, clean_planets: DataFrame) -> DataFrame:
-    return clean_people.drop("url").join(
+    return clean_people.select("name", "homeworld", "mass").join(
         clean_planets.select("name", "url").withColumnRenamed("name", "homeworld_name"),
         clean_people["homeworld"] == clean_planets["url"],
         how="left"
@@ -123,31 +126,52 @@ defs = Definitions(
 )
 
 
-# TODO test suite using something like this, pyspark IOM/Res over tmp folder and materialize(...)
-class FakeSWAPIResource(SWAPIResource):
-    def fetch(self, endpoint: str) -> dict:
-        if endpoint == "people":
-            return {}
-            #return {
-            #    "results": [
-            #        {
-            #            "name": "Luke Skywalker",
-            #            "height": "172",
-            #            "mass": "77",
-            #            "hair_color": "blond",
-        if endpoint == "planets":
-            return {
-                "results": [
+
+def test_assets(tmp_path: Path):
+    """Run pipeline and check that last asset has expected data."""
+    class FakeSWAPIResource(SWAPIResource):
+        def fetch(self, endpoint: str) -> list[dict]:
+            if endpoint == "people":
+                return [
+                    {
+                        "name": "Luke Skywalker",
+                        "height": "172",
+                        "mass": "77",
+                        "birth_year": "19BBY",
+                        "homeworld": "https://swapi.dev/api/planets/1/",
+                    }
+                ]
+            if endpoint == "planets":
+                return [
                     {
                         "name": "Tatooine",
                         "rotation_period": "23",
-                        "orbital_period": "304",
-                        "diameter": "10465",
-                        "climate": "arid",
-                        "gravity": "1 standard",
-                        "terrain": "desert",
-                        "url": "http://swapi.dev/api/planets/1/"
+                        "url": "https://swapi.dev/api/planets/1/"
                     }
                 ]
-            }
-        return {"results": []}
+            return []
+
+    expected_homeworlds_data = pd.DataFrame(
+        {
+            "name": ["Luke Skywalker"],
+            "homeworld": ["https://swapi.dev/api/planets/1/"],
+            "mass": [77.0],
+            "homeworld_name": ["Tatooine"],
+            "url": ["https://swapi.dev/api/planets/1/"],
+        }
+    )
+
+    materialization_result = materialize(
+        assets=[raw_people, raw_planets, clean_people, clean_planets, homeworlds],
+        resources={
+            "pyspark": PySparkResource(),
+            "pyspark_io_manager": PySparkIOManager(
+                pyspark_resource=PySparkResource(),
+                data_path=str(tmp_path)
+            ),
+            "swapi": FakeSWAPIResource(),
+        },
+    )
+    homeworlds_data = materialization_result.asset_value("homeworlds").toPandas()
+
+    assert homeworlds_data.equals(expected_homeworlds_data), homeworlds_data.to_string() + "\n\n" + expected_homeworlds_data.to_string()
