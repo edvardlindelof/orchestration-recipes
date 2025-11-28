@@ -104,8 +104,8 @@ def clean_planets(raw_planets: DataFrame) -> DataFrame:
 
 @asset(io_manager_key="pyspark_io_manager")
 def homeworlds(clean_people: DataFrame, clean_planets: DataFrame) -> DataFrame:
-    return clean_people.join(
-        clean_planets,
+    return clean_people.drop("url").join(
+        clean_planets.select("name", "url").withColumnRenamed("name", "homeworld_name"),
         clean_people["homeworld"] == clean_planets["url"],
         how="left"
     )
