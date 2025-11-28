@@ -63,7 +63,7 @@ def raw_people(swapi: SWAPIResource, pyspark: PySparkResource) -> DataFrame:
 
 @asset(io_manager_key="pyspark_io_manager")
 def raw_planets(swapi: SWAPIResource, pyspark: PySparkResource) -> DataFrame:
-    res = swapi.fetch("people")
+    res = swapi.fetch("planets")
     return pyspark.get_session().createDataFrame(res["results"])
 
 @asset(io_manager_key="pyspark_io_manager")
@@ -72,7 +72,10 @@ def clean_people(raw_people: DataFrame) -> DataFrame:
 
     # Replace unknown values with None
     unknown_values = ["unknown", "none", "null", "na", ""]
+    list_columns = {"films", "species", "vehicles", "starships"}
     for col_name in df.columns:
+        if col_name in list_columns:
+            continue
         df = df.withColumn(
             col_name,
             when(col(col_name).isin(unknown_values), None).otherwise(col(col_name))
@@ -85,7 +88,7 @@ def clean_people(raw_people: DataFrame) -> DataFrame:
     )
     df = df.withColumn(
         "birth_year",
-        regexp_replace(col("birth_year"), "BBY", "").cast("int")
+        regexp_replace(col("birth_year"), "BBY", "").cast("double").cast("int")
     )
 
     return df
