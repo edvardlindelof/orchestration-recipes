@@ -3,3 +3,4 @@ uv.lock
 airflow_home
 __pycache__
 .vscode
+.ipynb_checkpoints
