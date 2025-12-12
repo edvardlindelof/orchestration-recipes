@@ -1,6 +1,8 @@
-pyspark-data
+pyspark-data/*
 uv.lock
 airflow_home
 __pycache__
-.vscode
+.vscode/
 .ipynb_checkpoints
+.venv
+.pytest_cache

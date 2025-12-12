@@ -1,3 +1,4 @@
+"""WIP test. Doesn't work yet."""
 from pyspark.sql import SparkSession
 
 from airflow_dags.dag import clean_planets
@@ -25,8 +26,8 @@ def test_clean_planets():
     input_df = spark.createDataFrame(fake_swapi_response)
     input_df.write.mode("overwrite").parquet(input_path)
     
-    # Because of the airlfow decorator, this does not execute the actual code.
-    # Need to refactor to have a chance of testing anything ¯\_(ツ)_/¯.
+    # Because of the airlfow decorator, this does not execute the actual code
+    # Need to refactor to have a chance of testing anything
     clean_planets(spark)
     
     result_df = spark.read.parquet(output_path)

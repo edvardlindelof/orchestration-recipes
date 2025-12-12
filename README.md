@@ -1,10 +1,26 @@
-# Airflow/dagster comparison
+# Orchestration Recipes: Airflow vs Dagster
 
-## Airflow with PySpark
+This repository contains standalone examples comparing Airflow and Dagster orchestration frameworks.
 
-### Run
-1.
-  ```bash
-  uv run airflow standalone
-  ```
-2. go to http://localhost:8080 and enter the admin credentials that were printed in the very top of the `airflow standalone` log
+## Projects
+
+### 1. [dagster-pipeline-with-spark/](dagster-pipeline-with-spark/)
+Dagster pipeline using PySpark to fetch and transform Star Wars API data.
+
+### 2. [airflow-pipeline-with-spark/](airflow-pipeline-with-spark/)
+Airflow pipeline using PySpark for similar data processing tasks.
+
+### 3. [submit-file-to-dagster/](submit-file-to-dagster/)
+Proof of concept for submitting external files to a Dagster orchestrator.
+
+### 4. [submit-file-to-airflow/](submit-file-to-airflow/)
+Proof of concept for submitting external files to an Airflow orchestrator.
+
+## Structure
+
+Each project is self-contained with its own:
+- `README.md` - Project-specific documentation and running instructions
+- `pyproject.toml` - Python dependencies
+- `uv.lock` - Locked dependencies
+- `.venv/` - Virtual environment (gitignored)
+- Project-specific data directories (gitignored)

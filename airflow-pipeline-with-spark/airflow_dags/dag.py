@@ -19,17 +19,17 @@ def fetch_swapi(endpoint: str) -> list[dict]:
 
 @task.pyspark(outlets=[raw_planets_asset])
 def raw_planets(spark: SparkSession):
-    res = fetch_swapi("planets")  # <-- side effect obstructing testing
+    res = fetch_swapi("planets")
     df = spark.createDataFrame(res)
-    df.write.mode("overwrite").parquet("pyspark-data/raw_planets.parquet")  # <-- boilerplate tying us to platform
+    df.write.mode("overwrite").parquet("pyspark-data/raw_planets.parquet")
 
 @task.pyspark(inlets=[raw_planets_asset], outlets=[clean_planets_asset])
 def clean_planets(spark: SparkSession):
-    df = spark.read.parquet("pyspark-data/raw_planets.parquet")  # <-- boilerplate tying us to platform
-    df = df.withColumn("rotation_period", col("rotation_period").cast("int"))  # <-- this is what I care about
-    df.write.mode("overwrite").parquet("pyspark-data/clean_planets.parquet")  # <-- boilerplate tying us to platform
+    df = spark.read.parquet("pyspark-data/raw_planets.parquet")
+    df = df.withColumn("rotation_period", col("rotation_period").cast("int"))
+    df.write.mode("overwrite").parquet("pyspark-data/clean_planets.parquet")
 
-# I'd continue with these, but it's so boring and boilerplatey!!
+# TODO
 #
 # @task.pyspark(inlets=..., outlets=...)
 # def raw_people(spark: SparkSession):
@@ -46,6 +46,6 @@ def clean_planets(spark: SparkSession):
 
 @dag(dag_id="pyspark_pipeline", schedule=None, start_date=datetime(2024, 1, 1), catchup=False)
 def pyspark_pipeline():
-    raw_planets() >> clean_planets()  # <-- boilerplate
+    raw_planets() >> clean_planets()
 
 pyspark_pipeline()
