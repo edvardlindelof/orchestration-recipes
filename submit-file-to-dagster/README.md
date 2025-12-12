@@ -11,7 +11,6 @@ Proof of concept for submitting external files to a Dagster orchestrator for val
 ## Run
 
 ```bash
-uv sync
 uv run dagster dev -f defs.py
 ```
 

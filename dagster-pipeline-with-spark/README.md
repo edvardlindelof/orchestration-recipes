@@ -12,7 +12,6 @@ Dagster pipeline using PySpark to fetch and transform Star Wars API data.
 ## Run
 
 ```bash
-uv sync
 uv run dagster dev -f dagster_defs.py
 ```
 

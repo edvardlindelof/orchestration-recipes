@@ -11,7 +11,6 @@ Airflow pipeline using PySpark for data processing tasks with the Star Wars API.
 ## Run
 
 ```bash
-uv sync
 uv run airflow standalone
 ```
 

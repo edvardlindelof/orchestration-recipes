@@ -11,7 +11,6 @@ Proof of concept for submitting external files to an Airflow orchestrator for va
 ## Run
 
 ```bash
-uv sync
 uv run airflow standalone
 ```
 
@@ -22,4 +21,5 @@ Note: You may need to unpause the DAG with:
 uv run airflow dags unpause film_files_dag
 ```
 
+uv run --with jupyter jupyter lab
 TODO notebook

@@ -1,6 +1,5 @@
-# Orchestration Recipes: Airflow vs Dagster
-
-This repository contains standalone examples comparing Airflow and Dagster orchestration frameworks.
+# Orchestration recipes
+Collection of data and analytics workflow patterns for Dagster or Airflow.
 
 ## Projects
 
