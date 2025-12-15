@@ -58,6 +58,11 @@ My recommended way of achieving this is demonstrated in [submit-file-to-dagster/
 
 The validation step is highly useful since it imposes quality restrictions on any data submitted from lower quality code (e.g. Jupyter) for handling by higher quality code (the orchestrator), with instant feedback. Read the exemplifying notebooks for further understanding.
 
+## Requirements
+- Spark installation
+- [direnv](https://direnv.net/docs/installation.html) (this is to set the environment variables of the .envrc files, which can be done in other ways)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
 ## Structure
 
 Each project is self-contained with its own:
