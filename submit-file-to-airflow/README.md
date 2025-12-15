@@ -1,25 +1,7 @@
-# Submit File to Airflow
+# Submit file to Airflow
+Proof of concept for manually submitting validated files to an Airflow orchestrator.
 
-Proof of concept for submitting external files to an Airflow orchestrator for validation and processing.
-
-## Features
-
-- File-based workflow for external data submission
-- Data validation using Pandera
-- Airflow DAG-based processing
+Check out the [notebook](./notebook.ipynb) to see how it works from the perspective of a submitter using Jupyter.
 
 ## Run
-
-```bash
-uv run airflow standalone
-```
-
-Visit http://localhost:8080 and enter the admin credentials from the logs.
-
-Note: You may need to unpause the DAG with:
-```bash
-uv run airflow dags unpause film_files_dag
-```
-
-uv run --with jupyter jupyter lab
-TODO notebook
+Run `uv run airflow standalone` in one terminal and `uv run --with jupyter jupyter lab` in another terminal, then open the notebook in a browser.
