@@ -1,18 +1,7 @@
-# Submit File to Dagster
+# Submit file to Dagster
+Proof of concept for manually submitting validated files to a Dagster orchestrator.
 
-Proof of concept for submitting external files to a Dagster orchestrator for validation and processing.
-
-## Features
-
-- File-based workflow for external data submission
-- Data validation using Pandera
-- Dagster asset-based processing
+Check out the [notebook](./notebook.ipynb) to see how it works from the perspective of a submitter using Jupyter.
 
 ## Run
-
-```bash
-uv run dagster dev -f defs.py
-```
-
-Then open the Dagster UI to interact with the file submission workflow.
-TODO mention notebook
+Run `uv run dagster dev -f defs.py` in one terminal and `uv run --with jupyter jupyter lab` in another terminal, then open the notebook in a browser.
